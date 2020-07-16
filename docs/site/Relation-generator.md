@@ -32,9 +32,14 @@ lb4 relation [options]
 - `--relationType`: Relation type.
 - `--sourceModel`: Source model.
 - `--destinationModel`: Destination model.
+- `--throughModel`: Through model. For HasManyThrough relation only.
 - `--foreignKeyName`: Destination/Source model foreign key name for
   HasMany,HasOne/BelongsTo relation, respectively.
 - `--relationName`: Relation name.
+- `--sourceKeyOnThrough`: Foreign key that references the source model on the
+  through model. For HasManyThrough relation only.
+- `--targetKeyOnThrough`: Foreign key that references the target model on the
+  through model. For HasManyThrough relation only.
 - `-c`, `--config`: JSON file name or value to configure options.
 - `-y`, `--yes`: Skip all confirmation prompts with default or provided value.
 - `--format`: Format generated code using `npm run lint:fix`.
@@ -72,6 +77,31 @@ Check the site [Relations](HasMany-relation.md) and the
 [Querying Related Models](HasMany-relation.md#querying-related-models) section
 in each relation for more use cases.
 
+#### HasManyThrough
+
+Defining a HasManyThrough relation via the CLI is a bit different from defining
+HasMany, HasOne, or BelongsTo relations.
+
+```sh
+lb4 relation --sourceModel=<sourceModel>
+--destinationModel=<destinationModel> --throughModel=<throughModel>
+--relationType=<hasManyThrough> [--relationName=<relationName>]
+[--sourceKeyOnThrough=<sourceKeyOnThrough>] [--targetKeyOnThrough<targetKeyOnThrough>]
+```
+
+- `<throughModel>` - Name of the model to reference the source model and target
+  model.
+
+- `<sourceKeyOnThrough>` - Property on the through model that references the
+  primary key property of the source model.
+
+- `<targetKeyOnThrough>` - Property on the through model that references the
+  primary key property of the target model.
+
+Notice that the inclusion resolver is not supported in HasManyThrough relation
+yet. See
+[GitHub issue #5946](https://github.com/strongloop/loopback-next/issues/5946).
+
 ### Interactive Prompts
 
 The tool will prompt you for:
@@ -81,6 +111,7 @@ The tool will prompt you for:
   source model and the target model. Supported relation types:
 
   - [HasMany](HasMany-relation.md)
+  - [HasManyThrough](HasManyThrough-relation.md)
   - [HasOne](HasOne-relation.md)
   - [BelongsTo](BelongsTo-relation.md)
 
@@ -90,11 +121,25 @@ The tool will prompt you for:
 - **Name of the `target` model.** _(targetModel)_ Prompts a list of available
   models to choose from as the target model of the relation.
 
+- **Name of the `through` model.** _(targetModel)_ Prompts a list of available
+  models to choose from as the through model of the relation. For HasManyThrough
+  relation only.
+
 - **Name of the `foreign key`.** _(foreignKeyName)_ Prompts a property name that
   references the primary key property of the another model. Note: Leave blank to
-  use the default.
+  use the default. For HasMany/BelongsTo/HasOne relations.
 
   Default values: `<foreignKeyName>` + `Id` in camelCase, e.g `categoryId`
+
+- **Name of the `source key`.** _(sourceKeyOnThrough)_ Prompts a property name
+  that references the source model to define on the through model. For
+  HasManyThrough relation only. Default value: `<sourceModel>` + `Id`, e.g
+  `doctorId`.
+
+- **Name of the `target key`.** _(targetKeyOnThrough)_ Prompts a property name
+  that references the target model to define on the through model. For
+  HasManyThrough relation only. Default value: `<targetModel>` + `Id`, e.g
+  `patientId`.
 
 - **Name of the `relation`.** _(relationName)_ Prompts for the Source property
   name. Note: Leave blank to use the default.
